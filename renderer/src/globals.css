@@ -1,0 +1,65 @@
+.main-content {
+    padding-left: 45vh;
+    min-height: 100vh;
+}
+
+.blur {
+    background-color: rgba(0, 0, 0, 0.568);
+    pointer-events: none;
+    user-select: none;
+}
+
+@font-face {
+    font-family: "Oswald";
+    src: url("./assets/fonts/static/Oswald-Medium.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Oswald";
+    src: url("./assets/fonts/static/Oswald-Bold.ttf") format("truetype");
+    font-weight: 700;
+    font-style: normal;
+}
+
+* {
+    transition: 0.5s;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+.form-control,
+.form-date,
+.form-select {
+    border: 1.5px solid rgb(100, 99, 99);
+    text-align: center;
+    background-color: rgb(249, 249, 249);
+}
+
+.bg-warning-light {
+    background-color: rgb(252, 252, 223) !important;
+}
+
+.bg-danger-light {
+    background-color: rgb(255, 228, 228) !important;
+}
+
+.bg-danger-dark {
+    background-color: rgb(179, 17, 17);
+}
+
+.bg-success-light {
+    background-color: rgb(236, 255, 230) !important;
+}
+
+.Oswald {
+    font-family: "Oswald", sans-serif;
+}
+
+.Oswald-bold {
+    font-family: "Oswald", sans-serif;
+    font-weight: 700;
+}

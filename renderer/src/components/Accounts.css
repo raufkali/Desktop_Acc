@@ -1,0 +1,8 @@
+.account-container:hover .account-card {
+    opacity: 0.4;
+}
+
+.account-container .account-card:hover {
+    opacity: 1;
+    transform: scale(1.01);
+}
