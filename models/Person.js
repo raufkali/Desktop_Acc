@@ -21,6 +21,8 @@ const trxSchema = new mongoose.Schema({
   sender: String,
   receiver: String,
   amount: Number,
+  rate: Number,
+  quantity: Number,
   date: {
     type: Date,
     default: Date.now,
@@ -35,10 +37,8 @@ const personSchema = new mongoose.Schema(
       required: true,
     },
     transactions: {
-      sendTrx: [{ type: mongoose.Schema.Types.ObjectId, ref: "Transaction" }],
-      receiveTrx: [
-        { type: mongoose.Schema.Types.ObjectId, ref: "Transaction" },
-      ],
+      sendTrx: [trxSchema],
+      receiveTrx: [trxSchema],
     },
     debitors: [debCredSchema],
     creditors: [debCredSchema],

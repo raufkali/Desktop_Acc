@@ -6,6 +6,7 @@ const Person = require("../models/Person");
 // ─── Create Transaction ───────────────────────────────
 const createTransaction = async (data) => {
   try {
+    console.log("DATA: ", data);
     const {
       trxType,
       sender,
@@ -28,19 +29,20 @@ const createTransaction = async (data) => {
     if (!currentUser) {
       throw new Error("User not found!");
     }
-
+    console.log("CURRENT USER: ", currentUser);
     // find account for this user
     const account = await Account.findOne({
       name: fromAccount,
       userId: userId,
     });
+    console.log("Account: ", account);
     if (!account) {
       throw new Error("Account not Found!, please create Account first");
     }
 
     // ensure Person exists for current user
     let person = await Person.findOne({ userId });
-
+    console.log("Person:", person);
     let finalSender, finalReceiver;
 
     if (trxType === "send") {
