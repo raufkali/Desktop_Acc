@@ -4,6 +4,7 @@ import {
   faTachometerAlt,
   faClipboardList,
   faShoppingCart,
+  faPeopleGroup,
   faListAlt,
   faExchangeAlt,
   faUser,
@@ -60,6 +61,13 @@ const SidePanel = () => {
               <Link to="/transactions" className="nav-link">
                 <FontAwesomeIcon icon={faExchangeAlt} className="me-2" />
                 Transactions
+              </Link>
+            </li>
+
+            <li className="nav-item">
+              <Link to="/partners" className="nav-link">
+                <FontAwesomeIcon icon={faPeopleGroup} className="me-2" />
+                Partners
               </Link>
             </li>
             <li className="nav-item">

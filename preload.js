@@ -24,3 +24,11 @@ contextBridge.exposeInMainWorld("accountAPI", {
   delete: (id) => ipcRenderer.invoke("account:delete", id),
   getAll: (userId) => ipcRenderer.invoke("account:getAll", userId),
 });
+
+// ─── Partners ──────────────────────────────
+contextBridge.exposeInMainWorld("partnerAPI", {
+  create: (data) => ipcRenderer.invoke("partner:create", data),
+  delete: (payload) => ipcRenderer.invoke("partner:delete", payload),
+  update: (payload) => ipcRenderer.invoke("partner:update", payload),
+  getAll: (payload) => ipcRenderer.invoke("partner:getAll", payload),
+});

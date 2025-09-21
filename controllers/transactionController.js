@@ -2,7 +2,7 @@ const Transaction = require("../models/Trx");
 const User = require("../models/User");
 const Account = require("../models/Account");
 const Person = require("../models/Person");
-
+const Partner = require("../models/Partner");
 // ─── Create Transaction ───────────────────────────────
 const createTransaction = async (data) => {
   try {
@@ -17,6 +17,7 @@ const createTransaction = async (data) => {
       userId,
       fromAccount,
       createdAt,
+      onBehalfOf,
       note,
     } = data;
 

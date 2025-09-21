@@ -113,3 +113,47 @@ ipcMain.handle("account:getAll", async (event, userId) => {
     return { error: err.message };
   }
 });
+
+// ─── Partners ────────────────────────────
+const {
+  createPartner,
+  deletePartner,
+  updatePartner,
+  getAllPartners,
+} = require("./controllers/partnerController");
+
+ipcMain.handle("partner:create", async (event, payload) => {
+  try {
+    const partner = await createPartner(payload);
+    return serialize(partner); // ✅ ensure serializable
+  } catch (err) {
+    return { error: err.message };
+  }
+});
+
+ipcMain.handle("partner:delete", async (event, { id, userId }) => {
+  try {
+    const result = await deletePartner({ id, userId });
+    return serialize(result); // ✅ ensure serializable
+  } catch (err) {
+    return { error: err.message };
+  }
+});
+
+ipcMain.handle("partner:update", async (event, payload) => {
+  try {
+    const updated = await updatePartner(payload);
+    return serialize(updated); // ✅ ensure serializable
+  } catch (err) {
+    return { error: err.message };
+  }
+});
+
+ipcMain.handle("partner:getAll", async (event, { userId }) => {
+  try {
+    const partners = await getAllPartners({ userId });
+    return serialize(partners); // ✅ ensure serializable
+  } catch (err) {
+    return { error: err.message };
+  }
+});
