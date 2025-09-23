@@ -3,10 +3,10 @@ const User = require("../models/User");
 const Account = require("../models/Account");
 const Person = require("../models/Person");
 const Partner = require("../models/Partner");
+
 // ─── Create Transaction ───────────────────────────────
 const createTransaction = async (data) => {
   try {
-    console.log("DATA: ", data);
     const {
       trxType,
       sender,
@@ -30,35 +30,57 @@ const createTransaction = async (data) => {
     if (!currentUser) {
       throw new Error("User not found!");
     }
-    console.log("CURRENT USER: ", currentUser);
+
     // find account for this user
-    const account = await Account.findOne({
-      name: fromAccount,
-      userId: userId,
-    });
-    console.log("Account: ", account);
+    const account = await Account.findOne({ name: fromAccount, userId });
     if (!account) {
       throw new Error("Account not Found!, please create Account first");
     }
 
     // ensure Person exists for current user
     let person = await Person.findOne({ userId });
-    console.log("Person:", person);
+    if (!person) {
+      person = await Person.create({
+        userId,
+        transactions: { sendTrx: [], receiveTrx: [] },
+        debitors: [],
+        creditors: [],
+      });
+    }
+
     let finalSender, finalReceiver;
 
     if (trxType === "send") {
-      finalSender = currentUser.username;
+      finalSender = currentUser.username || currentUser.name || "Me";
       finalReceiver = receiver;
       account.balance = parseFloat(account.balance) - parseFloat(amount);
+
+      if (onBehalfOf) {
+        const partner = await Partner.findOne({ name: onBehalfOf, userId });
+        if (!partner) {
+          throw new Error("Partner doesn't exist");
+        }
+        console.log("Partner: ", partner);
+        partner.Balance = parseFloat(partner.Balance) + parseFloat(amount);
+
+        await partner.save();
+      }
     } else if (trxType === "receive") {
       finalSender = sender;
-      finalReceiver = currentUser.username;
+      finalReceiver = currentUser.username || currentUser.name || "Me";
       account.balance = parseFloat(account.balance) + parseFloat(amount);
+
+      // if received from a partner, adjust their balance
+      const partner = await Partner.findOne({ name: sender, userId });
+      if (partner) {
+        partner.Balance = parseFloat(partner.Balance) - parseFloat(amount);
+        await partner.save();
+      }
     } else {
       throw new Error("Invalid transaction type!");
     }
 
-    // save updated balance
+    // save updated account balance
     await account.save();
 
     // create transaction
@@ -71,24 +93,43 @@ const createTransaction = async (data) => {
       amount,
       rate,
       quantity,
+      onBehalfOf, // ✅ save this field
       note,
       userId,
     });
 
     // update Person transactions
     if (trxType === "send") {
-      person.transactions.sendTrx.push(trx._id);
-
-      person.debitors.push({
+      person.transactions.sendTrx.push({
         trxId: trx._id,
-        name: receiver,
-        amount,
-        rate,
-        quantity,
+        name: sender,
+        onBehalfOf: onBehalfOf,
+        amount: amount,
+        rate: rate,
+        quantity: quantity,
       });
+      // first check if the entry exsists in creditors:
+      if (!onBehalfOf) {
+        let cred = person.creditors.findOne({ name: onBehalfOf });
+        if (!cred) {
+          person.debitors.push({
+            trxId: trx._id,
+            name: onBehalfOf ? onBehalfOf : receiver,
+            amount,
+            rate,
+            quantity,
+          });
+        }
+      }
     } else if (trxType === "receive") {
-      person.transactions.receiveTrx.push(trx._id);
-
+      person.transactions.receiveTrx.push({
+        trxId: trx._id,
+        name: sender,
+        onBehalfOf: sender,
+        amount: amount,
+        rate: rate,
+        quantity: quantity,
+      });
       person.creditors.push({
         trxId: trx._id,
         name: sender,
@@ -123,8 +164,25 @@ const deleteTransaction = async ({ id, userId }) => {
     // reverse account balance
     if (trx.trxType === "send") {
       account.balance = parseFloat(account.balance) + parseFloat(trx.amount);
+
+      // reverse partner balance if involved
+      if (trx.onBehalfOf) {
+        const partner = await Partner.findOne({ name: trx.onBehalfOf, userId });
+        if (partner) {
+          partner.Balance =
+            parseFloat(partner.Balance) - parseFloat(trx.amount);
+          await partner.save();
+        }
+      }
     } else if (trx.trxType === "receive") {
       account.balance = parseFloat(account.balance) - parseFloat(trx.amount);
+
+      // reverse partner if sender was a partner
+      const partner = await Partner.findOne({ name: trx.sender, userId });
+      if (partner) {
+        partner.Balance = parseFloat(partner.Balance) + parseFloat(trx.amount);
+        await partner.save();
+      }
     }
     await account.save();
 
@@ -169,7 +227,6 @@ const deleteTransaction = async ({ id, userId }) => {
 const getTransactions = async ({ userId }) => {
   try {
     if (!userId) throw new Error("userId is required to fetch transactions!");
-
     const trxList = await Transaction.find({ userId }).sort({ createdAt: -1 });
     return JSON.parse(JSON.stringify(trxList));
   } catch (error) {

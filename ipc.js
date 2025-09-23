@@ -62,8 +62,16 @@ ipcMain.handle("transaction:delete", async (event, id) => {
 const {
   createPerson,
   deletePerson,
+  getPerson,
 } = require("./controllers/personController");
-
+ipcMain.handle("person:get", async (event, userId) => {
+  try {
+    const result = await getPerson(userId);
+    return serialize(result);
+  } catch (err) {
+    return { error: err.message };
+  }
+});
 ipcMain.handle("person:create", async (event, payload) => {
   try {
     const result = await createPerson(payload);

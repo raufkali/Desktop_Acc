@@ -37,6 +37,7 @@ const Login = () => {
         // store user session
         localStorage.setItem("user", JSON.stringify(res));
         navigate("/");
+        window.location.reload();
       }
     } catch (err) {
       setError("Server error. Try again.");
@@ -50,7 +51,7 @@ const Login = () => {
         style={{ maxWidth: "500px", width: "100%", borderRadius: "1rem" }}
       >
         {/* Tab Switcher */}
-        <div className="d-flex justify-content-around mb-4">
+        <div className="d-flex justify-content-around mb-2">
           <button
             className={`btn ${
               mode === "signin" ? "btn-dark" : "btn-outline-dark"
@@ -68,7 +69,7 @@ const Login = () => {
             Sign Up
           </button>
         </div>
-
+        <hr />
         {error && <div className="alert alert-danger">{error}</div>}
 
         {/* Animate form */}
@@ -76,12 +77,13 @@ const Login = () => {
           {mode === "signin" ? (
             <motion.div
               key="signin"
-              initial={{ opacity: 0, x: -50 }}
+              initial={{ opacity: 0, x: 0 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 50 }}
-              transition={{ duration: 0.3 }}
+              exit={{ opacity: 0, x: 0 }}
+              transition={{ duration: 0.2 }}
             >
-              <h3 className="text-center mb-3">Welcome Back 👋</h3>
+              <h3 className="text-center mb-3 Oswald-bold">Welcome Back</h3>
+              <hr />
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                   <label className="form-label">Email</label>
@@ -115,12 +117,13 @@ const Login = () => {
           ) : (
             <motion.div
               key="signup"
-              initial={{ opacity: 0, x: 50 }}
+              initial={{ opacity: 0, x: 0 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ duration: 0.3 }}
+              exit={{ opacity: 0, x: 0 }}
+              transition={{ duration: 0.2 }}
             >
-              <h3 className="text-center mb-3">Create Account ✨</h3>
+              <h3 className="text-center mb-3 Oswald-bold">Create Account</h3>
+              <hr />
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                   <label className="form-label">Username</label>

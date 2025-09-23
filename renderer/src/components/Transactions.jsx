@@ -6,11 +6,13 @@ const Transactions = () => {
   const [bgBlur, setBgBlur] = useState(false);
   const [transactions, setTransactions] = useState([]);
   const [accounts, setAccounts] = useState([]);
+  const [partners, setPartners] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [trxType, setTrxType] = useState("send");
   const [form, setForm] = useState({
     sender: "",
     receiver: "",
+    onBehalfOf: "",
     fromAccount: "",
     amount: "",
     rate: "",
@@ -36,7 +38,7 @@ const Transactions = () => {
     }
   };
 
-  // Fetch accounts and normalize
+  // Fetch accounts
   const fetchAccounts = async () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
@@ -58,9 +60,33 @@ const Transactions = () => {
     }
   };
 
+  // Fetch partners
+  const fetchPartners = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      // #{ERROR HERE}
+      const data = await window.partnerAPI.getAll({ userId: user?._id });
+      if (data && !data.error) {
+        const cleaned = (Array.isArray(data) ? data : data?.partners || []).map(
+          (partner) => ({
+            _id: partner._doc?._id || partner._id,
+            name: partner._doc?.name || partner.name,
+          })
+        );
+        setPartners(cleaned);
+      } else {
+        setError(data?.error || "Failed to fetch partners");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Failed to fetch partners");
+    }
+  };
+
   useEffect(() => {
     fetchTransactions();
     fetchAccounts();
+    fetchPartners();
   }, []);
 
   // Close modal helper
@@ -75,6 +101,7 @@ const Transactions = () => {
     setForm({
       sender: "",
       receiver: "",
+      onBehalfOf: "",
       fromAccount: accounts.length > 0 ? accounts[0].name : "",
       amount: "",
       rate: "",
@@ -91,20 +118,16 @@ const Transactions = () => {
     let updatedForm = { ...form, [name]: value };
 
     // Auto calculation for send transaction
-    if (trxType === "send") {
-      const { amount, rate, quantity } = updatedForm;
+    const { amount, rate, quantity } = updatedForm;
 
-      if (name === "amount" || name === "rate" || name === "quantity") {
-        if (amount && rate && !quantity) {
-          updatedForm.quantity = (amount / rate).toFixed(2);
-        } else if (amount && quantity && !rate) {
-          updatedForm.rate = (amount / quantity).toFixed(2);
-        } else if (rate && quantity && !amount) {
-          updatedForm.amount = (rate * quantity).toFixed(2);
-        }
-      }
+    if (quantity && rate) {
+      updatedForm.amount = parseFloat(quantity) * parseFloat(rate);
     }
-
+    // } else if (quantity && amount) {
+    //   updatedForm.rate = parseFloat(quantity) / parseFloat(amount);
+    // } else if (rate && amount) {
+    //   updatedForm.quantity = parseFloat(rate) / parseFloat(am9ount);
+    // }
     setForm(updatedForm);
   };
 
@@ -117,18 +140,18 @@ const Transactions = () => {
       let data = { ...form, trxType, userId: user?._id };
       // Auto-fill missing sender/receiver
       if (trxType === "send") {
-        data.sender = user.username || user.name || "Me"; // fallback
+        data.sender = user.username || user.name || "Me";
       } else if (trxType === "receive") {
-        data.receiver = user.username || user.name || "Me"; // fallback
+        data.receiver = user.username || user.name || "Me";
       }
-      console.log(data);
       const res = await window.api.createTransaction(data);
       if (res.error) {
         setError(res.error);
       } else {
         closeModal();
         fetchTransactions();
-        fetchAccounts(); // refresh account balances
+        fetchAccounts();
+        fetchPartners();
       }
     } catch (err) {
       console.error(err);
@@ -142,6 +165,7 @@ const Transactions = () => {
       await window.api.deleteTransaction(id, user?._id);
       fetchTransactions();
       fetchAccounts();
+      fetchPartners();
     } catch (err) {
       console.error(err);
       setError("Error deleting transaction");
@@ -159,12 +183,12 @@ const Transactions = () => {
         </button>
 
         {/* Transactions Table */}
-        <div className="row">
-          <div className="col-11">
+        <div className="row pe-4">
+          <div className="col-12">
             <div className="card shadow-sm">
               <div className="table-responsive p-4">
                 <h4 className="Oswald">Recent Transactions</h4>
-                <table className="table table-hover mb-0 table-bordered">
+                <table className="table table-hover table-striped border-dark border-1 mb-0 table-bordered">
                   <thead className="table-dark">
                     <tr className="Oswald text-center">
                       <th>#</th>
@@ -172,6 +196,7 @@ const Transactions = () => {
                       <th>Type</th>
                       <th>Sender</th>
                       <th>Receiver</th>
+                      <th>Partner</th>
                       <th>Account</th>
                       <th>Amount</th>
                       <th>Rate</th>
@@ -201,6 +226,7 @@ const Transactions = () => {
                           </td>
                           <td>{trx.sender || "-"}</td>
                           <td>{trx.receiver || "-"}</td>
+                          <td>{trx.onBehalfOf || "-"}</td>
                           <td>{trx.fromAccount || "-"}</td>
                           <td>{trx.amount || "-"}</td>
                           <td>{trx.rate || "-"}</td>
@@ -211,14 +237,14 @@ const Transactions = () => {
                               className="btn btn-sm btn-danger"
                               onClick={() => handleDelete(trx._id)}
                             >
-                              <FontAwesomeIcon icon={faTrash} /> Delete
+                              <FontAwesomeIcon icon={faTrash} />
                             </button>
                           </td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="11" className="text-center text-muted">
+                        <td colSpan="12" className="text-center text-muted">
                           No transactions yet
                         </td>
                       </tr>
@@ -233,7 +259,7 @@ const Transactions = () => {
 
       {/* Modal */}
       {showModal && (
-        <div className="modal show fade d-block" tabIndex="-1">
+        <div className="modal show fade d-block ms-5 blur" tabIndex="-1">
           <div className="modal-dialog modal-lg">
             <div className="modal-content shadow border-0">
               <form onSubmit={handleSubmit}>
@@ -289,15 +315,40 @@ const Transactions = () => {
                           ))}
                         </select>
                       </div>
+                      <div className="col-md-6">
+                        <label className="form-label">On Behalf Of</label>
+                        <select
+                          name="onBehalfOf"
+                          value={form.onBehalfOf}
+                          onChange={handleChange}
+                          className="form-select"
+                        >
+                          <option value="">-- None --</option>
+                          {partners.length > 0 &&
+                            partners.map((partner) => {
+                              const name =
+                                partner._doc?.name ||
+                                partner.name ||
+                                "Unnamed Partner";
+                              return (
+                                <option
+                                  key={partner._doc?._id || partner._id}
+                                  value={name}
+                                >
+                                  {name}
+                                </option>
+                              );
+                            })}
+                        </select>
+                      </div>
                       <div className="col-md-4">
-                        <label className="form-label">Amount</label>
+                        <label className="form-label">Quantity</label>
                         <input
                           type="number"
-                          name="amount"
-                          value={form.amount}
+                          name="quantity"
+                          value={form.quantity}
                           onChange={handleChange}
                           className="form-control"
-                          required
                         />
                       </div>
                       <div className="col-md-4">
@@ -310,14 +361,16 @@ const Transactions = () => {
                           className="form-control"
                         />
                       </div>
+
                       <div className="col-md-4">
-                        <label className="form-label">Quantity</label>
+                        <label className="form-label">Amount</label>
                         <input
                           type="number"
-                          name="quantity"
-                          value={form.quantity}
+                          name="amount"
+                          value={form.amount}
                           onChange={handleChange}
                           className="form-control"
+                          required
                         />
                       </div>
                     </div>
@@ -350,7 +403,27 @@ const Transactions = () => {
                           ))}
                         </select>
                       </div>
-                      <div className="col-md-6">
+                      <div className="col-md-4">
+                        <label className="form-label">Quantity</label>
+                        <input
+                          type="number"
+                          name="quantity"
+                          value={form.quantity}
+                          onChange={handleChange}
+                          className="form-control"
+                        />
+                      </div>
+                      <div className="col-md-4">
+                        <label className="form-label">Rate</label>
+                        <input
+                          type="number"
+                          name="rate"
+                          value={form.rate}
+                          onChange={handleChange}
+                          className="form-control"
+                        />
+                      </div>
+                      <div className="col-md-4">
                         <label className="form-label">Amount</label>
                         <input
                           type="number"

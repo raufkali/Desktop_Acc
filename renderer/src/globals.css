@@ -1,10 +1,20 @@
 .main-content {
     padding-left: 45vh;
     min-height: 100vh;
+    background-image: url("../bg.png");
+    background-position: center;
+    background-size: contain;
+    background-size: cover;
+    /* fills screen */
+
+    z-index: -1;
+
 }
+
 
 .blur {
     background-color: rgba(0, 0, 0, 0.568);
+    width: 100%;
     pointer-events: none;
     user-select: none;
 }

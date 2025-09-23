@@ -30,7 +30,23 @@ const deletePerson = async (id) => {
   }
 };
 
+const getPerson = async (userId) => {
+  try {
+    console.log(userId);
+    const person = await Person.findOne({ userId: userId });
+    console.log(person);
+    if (!person) {
+      return { success: false, error: "Person Not Found!" };
+    }
+    return { success: true, person };
+  } catch (error) {
+    console.error("Error Getting Person: ", error);
+    return { success: false, error: error.message };
+  }
+};
+
 module.exports = {
   createPerson,
   deletePerson,
+  getPerson,
 };

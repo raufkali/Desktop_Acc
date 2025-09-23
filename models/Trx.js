@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const newTrx = new mongoose.Schema({
+  _id: {
+    type: String,
+    default: () => new mongoose.Types.ObjectId().toString(),
+  },
   sender: {
     type: String,
     required: true,

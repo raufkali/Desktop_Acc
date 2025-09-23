@@ -3,8 +3,8 @@ const mongoose = require("mongoose");
 // Debit/Credit sub-schema
 const debCredSchema = new mongoose.Schema({
   trxId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Transaction",
+    type: String,
+    default: () => new mongoose.Schema.Types.ObjectId().toString(),
   },
   name: String,
   amount: Number,
@@ -22,6 +22,8 @@ const trxSchema = new mongoose.Schema({
   receiver: String,
   amount: Number,
   rate: Number,
+  onBehalfOf: String,
+
   quantity: Number,
   date: {
     type: Date,

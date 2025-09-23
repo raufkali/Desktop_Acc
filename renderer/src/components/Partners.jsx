@@ -95,7 +95,7 @@ const Partners = () => {
         {partners.length > 0 ? (
           partners.map((partner) => (
             <div className="col-md-5 mb-3" key={partner._id}>
-              <div className="card shadow-sm p-4 bg-light">
+              <div className="card shadow-sm  p-4 bg-light">
                 <div className="d-flex justify-content-between align-items-center">
                   <h5 className="mb-0 Oswald">{partner.name?.toUpperCase()}</h5>
                   <FontAwesomeIcon
@@ -106,9 +106,13 @@ const Partners = () => {
                   />
                 </div>
                 <p className="mt-2 mb-0 Oswald">
-                  Phone: <span className="text-primary">{partner.phone}</span>
+                  Phone: <span className="">{partner.phone}</span>
                 </p>
-                <p className="mb-0 Oswald text-success">
+                <p
+                  className={`mb-0 Oswald ${
+                    partner.Balance >= 0 ? "text-success" : " text-danger"
+                  }`}
+                >
                   Balance: {partner.Balance} PKR
                 </p>
               </div>

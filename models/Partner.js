@@ -7,7 +7,6 @@ const partnerSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    required: true,
   },
   Balance: {
     type: Number,

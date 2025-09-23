@@ -15,6 +15,7 @@ contextBridge.exposeInMainWorld("api", {
 // ─── Persons ───────────────────────────────
 contextBridge.exposeInMainWorld("personAPI", {
   create: (personData) => ipcRenderer.invoke("person:create", personData),
+  get: (userId) => ipcRenderer.invoke("person:get", userId),
   delete: (id) => ipcRenderer.invoke("person:delete", id),
 });
 
