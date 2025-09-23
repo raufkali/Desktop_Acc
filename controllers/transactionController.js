@@ -56,13 +56,11 @@ const createTransaction = async (data) => {
       account.balance = parseFloat(account.balance) - parseFloat(amount);
 
       if (onBehalfOf) {
+        // sending on behalf of a partner
         const partner = await Partner.findOne({ name: onBehalfOf, userId });
-        if (!partner) {
-          throw new Error("Partner doesn't exist");
-        }
-        console.log("Partner: ", partner);
-        partner.Balance = parseFloat(partner.Balance) + parseFloat(amount);
+        if (!partner) throw new Error("Partner doesn't exist");
 
+        partner.Balance = parseFloat(partner.Balance) + parseFloat(amount);
         await partner.save();
       }
     } else if (trxType === "receive") {
@@ -93,7 +91,7 @@ const createTransaction = async (data) => {
       amount,
       rate,
       quantity,
-      onBehalfOf, // ✅ save this field
+      onBehalfOf,
       note,
       userId,
     });
@@ -102,19 +100,74 @@ const createTransaction = async (data) => {
     if (trxType === "send") {
       person.transactions.sendTrx.push({
         trxId: trx._id,
-        name: sender,
-        onBehalfOf: onBehalfOf,
-        amount: amount,
-        rate: rate,
-        quantity: quantity,
+        name: receiver,
+        onBehalfOf: onBehalfOf || null,
+        amount,
+        rate,
+        quantity,
       });
-      // first check if the entry exsists in creditors:
-      if (!onBehalfOf) {
-        let cred = person.creditors.findOne({ name: onBehalfOf });
-        if (!cred) {
+
+      if (onBehalfOf) {
+        // 🔹 case: sending on behalf of someone
+        let cred = person.creditors.find((c) => c.name === onBehalfOf);
+        if (cred) {
+          let newAmnt = cred.amount - amount;
+          if (newAmnt > 0) {
+            cred.amount = newAmnt;
+          } else if (newAmnt === 0) {
+            person.creditors = person.creditors.filter(
+              (c) => c.name !== onBehalfOf
+            );
+          } else {
+            // became debitor
+            person.creditors = person.creditors.filter(
+              (c) => c.name !== onBehalfOf
+            );
+            person.debitors.push({
+              trxId: trx._id,
+              name: onBehalfOf,
+              amount: Math.abs(newAmnt),
+              rate,
+              quantity,
+            });
+          }
+        } else {
+          // not creditor, so add as debitor
           person.debitors.push({
             trxId: trx._id,
-            name: onBehalfOf ? onBehalfOf : receiver,
+            name: onBehalfOf,
+            amount,
+            rate,
+            quantity,
+          });
+        }
+      } else {
+        // 🔹 case: direct send to someone
+        let cred = person.creditors.find((c) => c.name === receiver);
+        if (cred) {
+          let newAmnt = cred.amount - amount;
+          if (newAmnt > 0) {
+            cred.amount = newAmnt;
+          } else if (newAmnt === 0) {
+            person.creditors = person.creditors.filter(
+              (c) => c.name !== receiver
+            );
+          } else {
+            person.creditors = person.creditors.filter(
+              (c) => c.name !== receiver
+            );
+            person.debitors.push({
+              trxId: trx._id,
+              name: receiver,
+              amount: Math.abs(newAmnt),
+              rate,
+              quantity,
+            });
+          }
+        } else {
+          person.debitors.push({
+            trxId: trx._id,
+            name: receiver,
             amount,
             rate,
             quantity,
@@ -122,26 +175,32 @@ const createTransaction = async (data) => {
         }
       }
     } else if (trxType === "receive") {
+      // receiving always means the sender becomes creditor
       person.transactions.receiveTrx.push({
-        trxId: trx._id,
-        name: sender,
-        onBehalfOf: sender,
-        amount: amount,
-        rate: rate,
-        quantity: quantity,
-      });
-      person.creditors.push({
         trxId: trx._id,
         name: sender,
         amount,
         rate,
         quantity,
       });
+
+      let cred = person.creditors.find((c) => c.name === sender);
+      if (cred) {
+        cred.amount += amount;
+      } else {
+        person.creditors.push({
+          trxId: trx._id,
+          name: sender,
+          amount,
+          rate,
+          quantity,
+        });
+      }
     }
 
     await person.save();
 
-    return JSON.parse(JSON.stringify(trx)); // serialize
+    return JSON.parse(JSON.stringify(trx));
   } catch (error) {
     return { error: error.message };
   }

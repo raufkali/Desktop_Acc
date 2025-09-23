@@ -18,8 +18,7 @@ const debCredSchema = new mongoose.Schema({
 
 // Transaction Schema
 const trxSchema = new mongoose.Schema({
-  sender: String,
-  receiver: String,
+  name: String,
   amount: Number,
   rate: Number,
   onBehalfOf: String,

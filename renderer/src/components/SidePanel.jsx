@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faTachometerAlt,
@@ -52,42 +52,41 @@ const SidePanel = () => {
         <div className="row mt-5">
           <ul className="col-12 navbar-nav navbar-dark text-light h5 gap-2">
             <li className="nav-item">
-              <Link to="/" className="nav-link active">
+              <NavLink to="/" className="nav-link">
                 <FontAwesomeIcon icon={faTachometerAlt} className="me-2" />
                 Dashboard
-              </Link>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <Link to="/transactions" className="nav-link">
+              <NavLink to="/transactions" className="nav-link">
                 <FontAwesomeIcon icon={faExchangeAlt} className="me-2" />
                 Transactions
-              </Link>
+              </NavLink>
             </li>
 
             <li className="nav-item">
-              <Link to="/partners" className="nav-link">
-                <FontAwesomeIcon icon={faPeopleGroup} className="me-2" />
-                Partners
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/ledger" className="nav-link">
+              <NavLink to="/ledger" className="nav-link">
                 <FontAwesomeIcon icon={faListAlt} className="me-2" />
                 ledger
-              </Link>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <Link to="/summary" className="nav-link">
+              <NavLink to="/summary" className="nav-link">
                 <FontAwesomeIcon icon={faClipboardList} className="me-2" />
                 Daily Summary
-              </Link>
+              </NavLink>
             </li>
-
             <li className="nav-item">
-              <Link to="/accounts" className="nav-link">
+              <NavLink to="/partners" className="nav-link">
+                <FontAwesomeIcon icon={faPeopleGroup} className="me-2" />
+                Partners
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/accounts" className="nav-link">
                 <FontAwesomeIcon icon={faUser} className="me-2" />
                 Accounts
-              </Link>
+              </NavLink>
             </li>
           </ul>
         </div>
@@ -97,10 +96,10 @@ const SidePanel = () => {
       <div className="mt-auto mb-3">
         {user && (
           <div className="nav-item mb-2">
-            <Link to="/profile" className="nav-link">
+            <NavLink to="/profile" className="nav-link">
               <FontAwesomeIcon icon={faIdBadge} className="me-2" />
               {user.username || "Profile"}
-            </Link>
+            </NavLink>
           </div>
         )}
 

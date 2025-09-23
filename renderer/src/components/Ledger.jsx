@@ -32,8 +32,8 @@ const Ledger = () => {
   }, []);
 
   return (
-    <div className="main-content pt-5 pe-4">
-      <div class="card bg-light shadow-sm p-5">
+    <div className="main-content pt-5 pb-4 pe-4">
+      <div class="card  bg-light-dark shadow p-5">
         {error && <h1 className="text-danger">{error}</h1>}
 
         {!error && person && (
@@ -42,11 +42,11 @@ const Ledger = () => {
               Ledger for: {person.name.toUpperCase()}
             </h2>
             {/* Creditors */}
-            <div className="card shadow-sm mb-3">
+            <div className="card mb-3 overflow-hidden border-light-dark">
               <div className="card-header d-flex justify-content-between align-items-center">
                 <h5 className="mb-0 Oswald">I need to Pay</h5>
                 <button
-                  className="btn btn-sm btn-outline-dark"
+                  className="btn btn-sm btn-dark"
                   onClick={() => setShowCreditors(!showCreditors)}
                 >
                   {showCreditors ? "Hide" : "Show"}
@@ -84,11 +84,11 @@ const Ledger = () => {
               )}
             </div>
             {/* Debitors */}
-            <div className="card shadow-sm mb-3">
+            <div className="card mb-3 overflow-hidden border-light-dark">
               <div className="card-header d-flex justify-content-between align-items-center">
                 <h5 className="mb-0 Oswald">Need to Pay me</h5>
                 <button
-                  className="btn btn-sm btn-outline-dark"
+                  className="btn btn-sm btn-dark"
                   onClick={() => setShowDebitors(!showDebitors)}
                 >
                   {showDebitors ? "Hide" : "Show"}
@@ -120,17 +120,19 @@ const Ledger = () => {
                       </tbody>
                     </table>
                   ) : (
-                    <p>No debitors</p>
+                    <div className="w-100 p-2 text-center">
+                      <p>No debitors</p>
+                    </div>
                   )}
                 </div>
               )}
             </div>
             {/* Sent Transactions */}
-            <div className="card shadow-sm mb-3">
+            <div className="card mb-3 overflow-hidden border-light-dark">
               <div className="card-header d-flex justify-content-between align-items-center">
                 <h5 className="mb-0 Oswald">Sent Transactions</h5>
                 <button
-                  className="btn btn-sm btn-outline-dark"
+                  className="btn btn-sm btn-dark"
                   onClick={() => setShowSent(!showSent)}
                 >
                   {showSent ? "Hide" : "Show"}
@@ -139,7 +141,7 @@ const Ledger = () => {
               {showSent && (
                 <div className="card-body p-0">
                   {person.transactions?.sendTrx?.length > 0 ? (
-                    <table className="table table-lightt mb-0 table-bordered">
+                    <table className="table table-lightt mb-0 table-bordered ">
                       <thead>
                         <tr className="table-dark">
                           <th>Receiver</th>
@@ -152,7 +154,8 @@ const Ledger = () => {
                       <tbody>
                         {person.transactions.sendTrx.map((trx, index) => (
                           <tr key={index}>
-                            <td>{trx.receiver}</td>
+                            {console.log(trx)}
+                            <td>{trx.name}</td>
                             <td>{trx.amount}</td>
                             <td>{trx.rate}</td>
                             <td>{trx.quantity}</td>
@@ -169,11 +172,11 @@ const Ledger = () => {
             </div>
 
             {/* Received Transactions */}
-            <div className="card shadow-sm  mb-3">
+            <div className="card  mb-3 border-light-dark overflow-hidden">
               <div className="card-header d-flex justify-content-between align-items-center">
                 <h5 className="mb-0 Oswald">Received Transactions</h5>
                 <button
-                  className="btn btn-sm btn-outline-dark"
+                  className="btn btn-sm btn-dark"
                   onClick={() => setShowReceived(!showReceived)}
                 >
                   {showReceived ? "Hide" : "Show"}

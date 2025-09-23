@@ -11,6 +11,21 @@
 
 }
 
+.blur-bg {
+    backdrop-filter: blur(2px);
+}
+
+.shadow-inside {
+    box-shadow: inset 0 0 8px rgb(153, 153, 153);
+}
+
+.border-light-dark {
+    border: 1.3px solid rgb(153, 153, 153);
+}
+
+.bg-light-dark {
+    background-color: rgba(242, 241, 241, 0.386);
+}
 
 .blur {
     background-color: rgba(0, 0, 0, 0.568);
