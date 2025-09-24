@@ -8,6 +8,7 @@ const Partners = () => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [balance, setBalance] = useState("");
+  const [quantity, setQuantity] = useState("");
   const [userId, setUserId] = useState(null);
 
   // ─── Get UserId from LocalStorage ───────────────────────────────
@@ -56,6 +57,7 @@ const Partners = () => {
         setName("");
         setPhone("");
         setBalance("");
+        setQuantity("");
         fetchPartners(); // auto-refresh
       } else {
         alert(res.error || "Failed to create partner");
@@ -94,10 +96,13 @@ const Partners = () => {
       <div className="row">
         {partners.length > 0 ? (
           partners.map((partner) => (
-            <div className="col-md-5 mb-3" key={partner._id}>
+            <div className="col-md-6 mb-3" key={partner._id}>
               <div className="card shadow-sm  p-4 bg-light">
                 <div className="d-flex justify-content-between align-items-center">
-                  <h5 className="mb-0 Oswald">{partner.name?.toUpperCase()}</h5>
+                  <h5 className="mb-0 Oswald">
+                    Name: {partner.name?.toUpperCase()}
+                  </h5>
+
                   <FontAwesomeIcon
                     icon={faTrash}
                     className="text-danger"
@@ -105,15 +110,23 @@ const Partners = () => {
                     onClick={() => handleDelete(partner._id)}
                   />
                 </div>
-                <p className="mt-2 mb-0 Oswald">
+                <h6 className="Oswald mt-2">
                   Phone: <span className="">{partner.phone}</span>
-                </p>
+                </h6>
+                {/* <hr /> */}
                 <p
                   className={`mb-0 Oswald ${
                     partner.Balance >= 0 ? "text-success" : " text-danger"
                   }`}
                 >
                   Balance: {partner.Balance} PKR
+                </p>
+                <p
+                  className={`mb-0 Oswald ${
+                    partner.Quantity >= 0 ? "text-success" : " text-danger"
+                  }`}
+                >
+                  Quantity: {partner.Quantity}
                 </p>
               </div>
             </div>
@@ -162,13 +175,22 @@ const Partners = () => {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                   />
-                  <input
-                    type="number"
-                    className="form-control"
-                    placeholder="Initial Balance"
-                    value={balance}
-                    onChange={(e) => setBalance(e.target.value)}
-                  />
+                  <div class="d-flex gap-2">
+                    <input
+                      type="number"
+                      className="form-control"
+                      placeholder="Initial Balance "
+                      value={balance}
+                      onChange={(e) => setBalance(e.target.value)}
+                    />
+                    <input
+                      type="number"
+                      className="form-control "
+                      placeholder="Initial Quantity"
+                      value={balance}
+                      onChange={(e) => setQuantity(e.target.value)}
+                    />
+                  </div>
                 </div>
 
                 <div className="modal-footer">
@@ -178,7 +200,7 @@ const Partners = () => {
                   >
                     Cancel
                   </button>
-                  <button className="btn btn-primary" onClick={handleCreate}>
+                  <button className="btn btn-dark" onClick={handleCreate}>
                     Save Partner
                   </button>
                 </div>

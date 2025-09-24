@@ -89,10 +89,10 @@ const Account = () => {
       <div className="row">
         {accounts.length > 0 ? (
           accounts.map((acc, indx) => (
-            <div className="col-md-5 mb-3" key={acc._doc._id}>
+            <div className="col-md-6 mb-3" key={acc._doc._id}>
               <div className="card shadow-sm p-4 bg-light">
                 <div className="d-flex justify-content-between align-items-center">
-                  <h5 className="mb-0 Oswald">
+                  <h5 className="mb-2 Oswald">
                     {acc._doc.name?.toUpperCase()}
                   </h5>
                   <FontAwesomeIcon
@@ -102,7 +102,11 @@ const Account = () => {
                     onClick={() => handleDelete(acc._doc._id)}
                   />
                 </div>
-                <p className="mt-2 mb-0 Oswald text-success">
+                <p
+                  className={`mt-2 mb-0 Oswald ${
+                    acc._doc.balance < 0 ? "text-danger" : "text-success"
+                  }`}
+                >
                   Balance: {acc._doc.balance} PKR
                 </p>
               </div>

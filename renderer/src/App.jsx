@@ -8,6 +8,7 @@ import Login from "./components/Login.jsx";
 import DailySummary from "./components/DailySummary.jsx";
 import Ledger from "./components/Ledger.jsx";
 import Partners from "./components/Partners.jsx";
+import Profile from "./components/Profile.jsx";
 const App = () => {
   return (
     <>
@@ -20,6 +21,7 @@ const App = () => {
         <Route path="/transactions" element={<Transactions />} />
         <Route path="/accounts" element={<Accounts />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </>
   );

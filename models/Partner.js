@@ -10,6 +10,11 @@ const partnerSchema = new mongoose.Schema({
   },
   Balance: {
     type: Number,
+    default: 0,
+  },
+  Quantity: {
+    type: Number,
+    default: 0,
   },
   _id: {
     type: String,

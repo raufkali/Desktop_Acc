@@ -60,7 +60,6 @@ const Ledger = () => {
                         <tr className="table-dark">
                           <th>Name</th>
                           <th>Amount</th>
-                          <th>Rate</th>
                           <th>Quantity</th>
                           <th>Date</th>
                         </tr>
@@ -70,7 +69,6 @@ const Ledger = () => {
                           <tr key={index}>
                             <td>{c.name}</td>
                             <td>{c.amount}</td>
-                            <td>{c.rate}</td>
                             <td>{c.quantity}</td>
                             <td>{new Date(c.date).toLocaleDateString()}</td>
                           </tr>
@@ -102,7 +100,6 @@ const Ledger = () => {
                         <tr className="table-dark">
                           <th>Name</th>
                           <th>Amount</th>
-                          <th>Rate</th>
                           <th>Quantity</th>
                           <th>Date</th>
                         </tr>
@@ -112,7 +109,6 @@ const Ledger = () => {
                           <tr key={index}>
                             <td>{d.name}</td>
                             <td>{d.amount}</td>
-                            <td>{d.rate}</td>
                             <td>{d.quantity}</td>
                             <td>{new Date(d.date).toLocaleDateString()}</td>
                           </tr>
@@ -198,7 +194,7 @@ const Ledger = () => {
                       <tbody>
                         {person.transactions.receiveTrx.map((trx, index) => (
                           <tr key={index}>
-                            <td>{trx.sender}</td>
+                            <td>{trx.name}</td>
                             <td>{trx.amount}</td>
                             <td>{trx.rate}</td>
                             <td>{trx.quantity}</td>

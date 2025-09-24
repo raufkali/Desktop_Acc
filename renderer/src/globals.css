@@ -16,7 +16,8 @@
 }
 
 .shadow-inside {
-    box-shadow: inset 0 0 8px rgb(153, 153, 153);
+    box-shadow: inset 0 0 8px rgb(229, 229, 229);
+    border: 1.3px solid rgb(214, 214, 214)
 }
 
 .border-light-dark {

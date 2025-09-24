@@ -32,9 +32,7 @@ const deletePerson = async (id) => {
 
 const getPerson = async (userId) => {
   try {
-    console.log(userId);
     const person = await Person.findOne({ userId: userId });
-    console.log(person);
     if (!person) {
       return { success: false, error: "Person Not Found!" };
     }

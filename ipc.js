@@ -165,3 +165,14 @@ ipcMain.handle("partner:getAll", async (event, { userId }) => {
     return { error: err.message };
   }
 });
+
+// ─── Summary ─────────────────────────────
+const { getSummary } = require("./controllers/summaryController");
+ipcMain.handle("summary:get", async (event, userId) => {
+  try {
+    const summary = await getSummary(userId);
+    return serialize(summary);
+  } catch (err) {
+    return { error: err.message };
+  }
+});

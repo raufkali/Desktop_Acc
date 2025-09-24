@@ -54,13 +54,13 @@ const createTransaction = async (data) => {
       finalSender = currentUser.username || currentUser.name || "Me";
       finalReceiver = receiver;
       account.balance = parseFloat(account.balance) - parseFloat(amount);
-
       if (onBehalfOf) {
         // sending on behalf of a partner
         const partner = await Partner.findOne({ name: onBehalfOf, userId });
         if (!partner) throw new Error("Partner doesn't exist");
 
         partner.Balance = parseFloat(partner.Balance) + parseFloat(amount);
+        partner.Quantity = parseFloat(partner.Quantity) + parseFloat(quantity);
         await partner.save();
       }
     } else if (trxType === "receive") {
@@ -71,7 +71,10 @@ const createTransaction = async (data) => {
       // if received from a partner, adjust their balance
       const partner = await Partner.findOne({ name: sender, userId });
       if (partner) {
+        console.log(partner);
         partner.Balance = parseFloat(partner.Balance) - parseFloat(amount);
+        partner.Quantity = parseFloat(partner.Quantity) - parseFloat(quantity);
+
         await partner.save();
       }
     } else {

@@ -174,7 +174,7 @@ const Transactions = () => {
 
   return (
     <>
-      <div className={`main-content ${bgBlur ? "blur" : ""}`}>
+      <div className={`main-content`}>
         <h1 className="Oswald mb-4 pt-4">Transactions</h1>
 
         {/* Create Transaction Button */}
@@ -258,224 +258,233 @@ const Transactions = () => {
       </div>
 
       {/* Modal */}
+
       {showModal && (
-        <div className="modal show fade d-block ms-5 blur" tabIndex="-1">
-          <div className="modal-dialog modal-lg">
-            <div className="modal-content shadow border-0">
-              <form onSubmit={handleSubmit}>
-                <div className="modal-header bg-dark text-white">
-                  <h4 className="modal-title Oswald">
-                    Create {trxType} Transaction
-                  </h4>
-                  <button
-                    type="button"
-                    className="btn-close btn-close-white"
-                    onClick={closeModal}
-                  ></button>
-                </div>
-                <div className="modal-body">
-                  <div className="mb-3">
-                    <label className="form-label">Transaction Type</label>
-                    <select
-                      className="form-select"
-                      value={trxType}
-                      onChange={(e) => setTrxType(e.target.value)}
+        <>
+          <div className="modal-backdrop fade show"></div>
+          <div
+            className="modal show fade d-block ms-5"
+            role="dialog"
+            tabIndex="-1"
+            style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+          >
+            <div className="modal-dialog  modal-dialog-centered modal-lg">
+              <div className="modal-content shadow border-0">
+                <form onSubmit={handleSubmit}>
+                  <div className="modal-header bg-dark text-white">
+                    <h4 className="modal-title Oswald">
+                      Create {trxType} Transaction
+                    </h4>
+                    <button
+                      type="button"
+                      className="btn-close btn-close-white"
+                      onClick={closeModal}
+                    ></button>
+                  </div>
+                  <div className="modal-body">
+                    <div className="mb-3">
+                      <label className="form-label">Transaction Type</label>
+                      <select
+                        className="form-select"
+                        value={trxType}
+                        onChange={(e) => setTrxType(e.target.value)}
+                      >
+                        <option value="send">Send</option>
+                        <option value="receive">Receive</option>
+                      </select>
+                    </div>
+
+                    {trxType === "send" ? (
+                      <div className="row g-3">
+                        <div className="col-md-4">
+                          <label className="form-label">Receiver</label>
+                          <input
+                            type="text"
+                            name="receiver"
+                            value={form.receiver}
+                            onChange={handleChange}
+                            className="form-control"
+                            required
+                          />
+                        </div>
+                        <div className="col-md-4">
+                          <label className="form-label">Account</label>
+                          <select
+                            name="fromAccount"
+                            value={form.fromAccount}
+                            onChange={handleChange}
+                            className="form-select"
+                            required
+                          >
+                            {accounts.map((acc) => (
+                              <option key={acc._id} value={acc.name}>
+                                {acc.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="col-md-4">
+                          <label className="form-label">On Behalf Of</label>
+                          <select
+                            name="onBehalfOf"
+                            value={form.onBehalfOf}
+                            onChange={handleChange}
+                            className="form-select"
+                          >
+                            <option value="">-- None --</option>
+                            {partners.length > 0 &&
+                              partners.map((partner) => {
+                                const name =
+                                  partner._doc?.name ||
+                                  partner.name ||
+                                  "Unnamed Partner";
+                                return (
+                                  <option
+                                    key={partner._doc?._id || partner._id}
+                                    value={name}
+                                  >
+                                    {name}
+                                  </option>
+                                );
+                              })}
+                          </select>
+                        </div>
+                        <div className="col-md-4">
+                          <label className="form-label">Quantity</label>
+                          <input
+                            type="number"
+                            name="quantity"
+                            value={form.quantity}
+                            onChange={handleChange}
+                            className="form-control"
+                          />
+                        </div>
+                        <div className="col-md-4">
+                          <label className="form-label">Rate</label>
+                          <input
+                            type="number"
+                            name="rate"
+                            value={form.rate}
+                            onChange={handleChange}
+                            className="form-control"
+                          />
+                        </div>
+
+                        <div className="col-md-4">
+                          <label className="form-label">Amount</label>
+                          <input
+                            type="number"
+                            name="amount"
+                            value={form.amount}
+                            onChange={handleChange}
+                            className="form-control"
+                            required
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="row g-3">
+                        <div className="col-md-6">
+                          <label className="form-label">Sender</label>
+                          <input
+                            type="text"
+                            name="sender"
+                            value={form.sender}
+                            onChange={handleChange}
+                            className="form-control"
+                            required
+                          />
+                        </div>
+                        <div className="col-md-6">
+                          <label className="form-label">Account</label>
+                          <select
+                            name="fromAccount"
+                            value={form.fromAccount}
+                            onChange={handleChange}
+                            className="form-select"
+                            required
+                          >
+                            {accounts.map((acc) => (
+                              <option key={acc._id} value={acc.name}>
+                                {acc.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="col-md-4">
+                          <label className="form-label">Quantity</label>
+                          <input
+                            type="number"
+                            name="quantity"
+                            value={form.quantity}
+                            onChange={handleChange}
+                            className="form-control"
+                          />
+                        </div>
+                        <div className="col-md-4">
+                          <label className="form-label">Rate</label>
+                          <input
+                            type="number"
+                            name="rate"
+                            value={form.rate}
+                            onChange={handleChange}
+                            className="form-control"
+                          />
+                        </div>
+                        <div className="col-md-4">
+                          <label className="form-label">Amount</label>
+                          <input
+                            type="number"
+                            name="amount"
+                            value={form.amount}
+                            onChange={handleChange}
+                            className="form-control"
+                            required
+                          />
+                        </div>
+                      </div>
+                    )}
+                    <div className="row g-3 mt-2">
+                      <div className="col-md-6">
+                        <label className="form-label">Date</label>
+                        <input
+                          type="date"
+                          name="createdAt"
+                          value={form.createdAt}
+                          onChange={handleChange}
+                          className="form-control"
+                          required
+                        />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="form-label">Note</label>
+                        <textarea
+                          name="note"
+                          value={form.note}
+                          onChange={handleChange}
+                          className="form-control"
+                          rows="1"
+                        ></textarea>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="modal-footer bg-light">
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={closeModal}
                     >
-                      <option value="send">Send</option>
-                      <option value="receive">Receive</option>
-                    </select>
+                      Cancel
+                    </button>
+                    <button type="submit" className="btn btn-dark">
+                      Save Transaction
+                    </button>
                   </div>
-
-                  {trxType === "send" ? (
-                    <div className="row g-3">
-                      <div className="col-md-6">
-                        <label className="form-label">Receiver</label>
-                        <input
-                          type="text"
-                          name="receiver"
-                          value={form.receiver}
-                          onChange={handleChange}
-                          className="form-control"
-                          required
-                        />
-                      </div>
-                      <div className="col-md-6">
-                        <label className="form-label">Account</label>
-                        <select
-                          name="fromAccount"
-                          value={form.fromAccount}
-                          onChange={handleChange}
-                          className="form-select"
-                          required
-                        >
-                          {accounts.map((acc) => (
-                            <option key={acc._id} value={acc.name}>
-                              {acc.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="col-md-6">
-                        <label className="form-label">On Behalf Of</label>
-                        <select
-                          name="onBehalfOf"
-                          value={form.onBehalfOf}
-                          onChange={handleChange}
-                          className="form-select"
-                        >
-                          <option value="">-- None --</option>
-                          {partners.length > 0 &&
-                            partners.map((partner) => {
-                              const name =
-                                partner._doc?.name ||
-                                partner.name ||
-                                "Unnamed Partner";
-                              return (
-                                <option
-                                  key={partner._doc?._id || partner._id}
-                                  value={name}
-                                >
-                                  {name}
-                                </option>
-                              );
-                            })}
-                        </select>
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label">Quantity</label>
-                        <input
-                          type="number"
-                          name="quantity"
-                          value={form.quantity}
-                          onChange={handleChange}
-                          className="form-control"
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label">Rate</label>
-                        <input
-                          type="number"
-                          name="rate"
-                          value={form.rate}
-                          onChange={handleChange}
-                          className="form-control"
-                        />
-                      </div>
-
-                      <div className="col-md-4">
-                        <label className="form-label">Amount</label>
-                        <input
-                          type="number"
-                          name="amount"
-                          value={form.amount}
-                          onChange={handleChange}
-                          className="form-control"
-                          required
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="row g-3">
-                      <div className="col-md-6">
-                        <label className="form-label">Sender</label>
-                        <input
-                          type="text"
-                          name="sender"
-                          value={form.sender}
-                          onChange={handleChange}
-                          className="form-control"
-                          required
-                        />
-                      </div>
-                      <div className="col-md-6">
-                        <label className="form-label">Account</label>
-                        <select
-                          name="fromAccount"
-                          value={form.fromAccount}
-                          onChange={handleChange}
-                          className="form-select"
-                          required
-                        >
-                          {accounts.map((acc) => (
-                            <option key={acc._id} value={acc.name}>
-                              {acc.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label">Quantity</label>
-                        <input
-                          type="number"
-                          name="quantity"
-                          value={form.quantity}
-                          onChange={handleChange}
-                          className="form-control"
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label">Rate</label>
-                        <input
-                          type="number"
-                          name="rate"
-                          value={form.rate}
-                          onChange={handleChange}
-                          className="form-control"
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label">Amount</label>
-                        <input
-                          type="number"
-                          name="amount"
-                          value={form.amount}
-                          onChange={handleChange}
-                          className="form-control"
-                          required
-                        />
-                      </div>
-                    </div>
-                  )}
-                  <div className="row g-3 mt-2">
-                    <div className="col-md-6">
-                      <label className="form-label">Date</label>
-                      <input
-                        type="date"
-                        name="createdAt"
-                        value={form.createdAt}
-                        onChange={handleChange}
-                        className="form-control"
-                        required
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label">Note</label>
-                      <textarea
-                        name="note"
-                        value={form.note}
-                        onChange={handleChange}
-                        className="form-control"
-                        rows="1"
-                      ></textarea>
-                    </div>
-                  </div>
-                </div>
-                <div className="modal-footer bg-light">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={closeModal}
-                  >
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn btn-dark">
-                    Save Transaction
-                  </button>
-                </div>
-              </form>
+                </form>
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </>
   );

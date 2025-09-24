@@ -33,3 +33,8 @@ contextBridge.exposeInMainWorld("partnerAPI", {
   update: (payload) => ipcRenderer.invoke("partner:update", payload),
   getAll: (payload) => ipcRenderer.invoke("partner:getAll", payload),
 });
+
+// ─── Summary ──────────────────────────────
+contextBridge.exposeInMainWorld("summaryAPI", {
+  get: (userId) => ipcRenderer.invoke("summary:get", userId),
+});
