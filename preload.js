@@ -38,3 +38,8 @@ contextBridge.exposeInMainWorld("partnerAPI", {
 contextBridge.exposeInMainWorld("summaryAPI", {
   get: (userId) => ipcRenderer.invoke("summary:get", userId),
 });
+
+// ─── Dashboard ──────────────────────────────
+contextBridge.exposeInMainWorld("dashboardAPI", {
+  get: (userId) => ipcRenderer.invoke("dashboard:get", userId),
+});

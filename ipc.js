@@ -176,3 +176,14 @@ ipcMain.handle("summary:get", async (event, userId) => {
     return { error: err.message };
   }
 });
+
+// ─── Dashboard ───────────────────────────
+const { getDashboard } = require("./controllers/dashboardController");
+ipcMain.handle("dashboard:get", async (event, userId) => {
+  try {
+    const dashboard = await getDashboard(userId);
+    return serialize(dashboard);
+  } catch (err) {
+    return { error: err.message };
+  }
+});

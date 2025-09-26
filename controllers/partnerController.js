@@ -2,7 +2,7 @@ const Partner = require("../models/Partner");
 
 // ─── Create Partner ───────────────────────────────
 const createPartner = async ({ name, phone, Balance, userId, Quantity }) => {
-  const exsist = await Partner.findOne({ name: name });
+  const exsist = await Partner.findOne({ name: name, userId: userId });
   if (exsist) {
     throw new Error("Partner already exsists");
   }

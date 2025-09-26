@@ -143,6 +143,11 @@ const Transactions = () => {
         data.sender = user.username || user.name || "Me";
       } else if (trxType === "receive") {
         data.receiver = user.username || user.name || "Me";
+        // check if the sender is our partner
+        if (partners.some((p) => p.name === form.sender)) {
+          // set onBehalf of to partner
+          data.onBehalfOf = form.sender;
+        }
       }
       const res = await window.api.createTransaction(data);
       if (res.error) {

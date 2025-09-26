@@ -7,6 +7,14 @@ const DailySummary = () => {
   const [error, setError] = useState("");
   const summaryRef = useRef(null); // reference for capturing
 
+  // ✅ Helper function to safely format numbers
+  const formatNumber = (value, decimals = 2) => {
+    if (value === null || value === undefined || isNaN(value)) {
+      return (0).toFixed(decimals);
+    }
+    return Number(value).toFixed(decimals);
+  };
+
   // Fetch Summary Data
   const fetchSummary = async () => {
     try {
@@ -59,7 +67,7 @@ const DailySummary = () => {
                   <div className="card-body">
                     <h5 className="card-title">Total Sent Balance</h5>
                     <p className="card-text fs-4 text-danger">
-                      {summaryData.totalSend.toFixed(2)}
+                      {formatNumber(summaryData.totalSend)}
                     </p>
                   </div>
                 </div>
@@ -69,7 +77,7 @@ const DailySummary = () => {
                   <div className="card-body">
                     <h5 className="card-title">Total Received Balance</h5>
                     <p className="card-text fs-4 text-success">
-                      {summaryData.totalReceive.toFixed(2)}
+                      {formatNumber(summaryData.totalReceive)}
                     </p>
                   </div>
                 </div>
@@ -80,12 +88,12 @@ const DailySummary = () => {
                     <h5 className="card-title">Net Balance</h5>
                     <p
                       className={`card-text fs-4 ${
-                        summaryData.netBalance < 0
+                        (summaryData.netBalance || 0) < 0
                           ? "text-danger"
                           : "text-success"
                       }`}
                     >
-                      {summaryData.netBalance.toFixed(2)}
+                      {formatNumber(summaryData.netBalance)}
                     </p>
                   </div>
                 </div>
@@ -95,7 +103,7 @@ const DailySummary = () => {
                   <div className="card-body">
                     <h5 className="card-title">Total Send Quantity</h5>
                     <p className="card-text fs-4 text-danger">
-                      {summaryData.totalSendQuantity.toFixed(2)}
+                      {summaryData.totalSendQuantity ?? 0}
                     </p>
                   </div>
                 </div>
@@ -105,7 +113,7 @@ const DailySummary = () => {
                   <div className="card-body">
                     <h5 className="card-title">Total Received Quantity</h5>
                     <p className="card-text fs-4 text-success">
-                      {summaryData.totalReceiveQuantity.toFixed(2)}
+                      {summaryData.totalReceiveQuantity ?? 0}
                     </p>
                   </div>
                 </div>
@@ -116,12 +124,12 @@ const DailySummary = () => {
                     <h5 className="card-title">Net Quantity</h5>
                     <p
                       className={`card-text fs-4 ${
-                        summaryData.netQuantity < 0
+                        (summaryData.netQuantity || 0) < 0
                           ? "text-danger"
                           : "text-success"
                       }`}
                     >
-                      {summaryData.netQuantity.toFixed(2)}
+                      {summaryData.netQuantity ?? 0}
                     </p>
                   </div>
                 </div>
@@ -129,7 +137,7 @@ const DailySummary = () => {
             </div>
 
             {/* Sent Transactions */}
-            {summaryData.SendTrx.length > 0 && (
+            {summaryData.SendTrx && (
               <div className="mt-4">
                 <h3 className="Oswald mb-3">Sent Transactions</h3>
                 <div className="table-responsive">
@@ -150,12 +158,16 @@ const DailySummary = () => {
                     <tbody>
                       {summaryData.SendTrx.map((trx, idx) => (
                         <tr key={trx._id}>
-                          <td>{idx}</td>
-                          <td>{new Date(trx.createdAt).toLocaleString()}</td>
+                          <td>{idx + 1}</td>
+                          <td>
+                            {trx.createdAt
+                              ? new Date(trx.createdAt).toLocaleString()
+                              : "-"}
+                          </td>
                           <td>{trx.onBehalfOf || trx.receiver || "-"}</td>
-                          <td>{trx.amount.toFixed(2)}</td>
-                          <td>{trx.quantity}</td>
-                          <td>{trx.rate.toFixed(2)}</td>
+                          <td>{formatNumber(trx.amount)}</td>
+                          <td>{trx.quantity ?? 0}</td>
+                          <td>{formatNumber(trx.rate)}</td>
                           <td>{trx.fromAccount || "-"}</td>
                           <td>{trx.onBehalfOf || "-"}</td>
                           <td>{trx.note || "-"}</td>
@@ -168,7 +180,7 @@ const DailySummary = () => {
             )}
 
             {/* Receive Transactions */}
-            {summaryData.ReceiveTrx.length > 0 && (
+            {summaryData.ReceiveTrx && (
               <div className="mt-4">
                 <h3 className="Oswald mb-3">Receive Transactions</h3>
                 <div className="table-responsive">
@@ -188,12 +200,16 @@ const DailySummary = () => {
                     <tbody>
                       {summaryData.ReceiveTrx.map((trx, idx) => (
                         <tr key={trx._id}>
-                          <td>{idx}</td>
-                          <td>{new Date(trx.createdAt).toLocaleString()}</td>
+                          <td>{idx + 1}</td>
+                          <td>
+                            {trx.createdAt
+                              ? new Date(trx.createdAt).toLocaleString()
+                              : "-"}
+                          </td>
                           <td>{trx.onBehalfOf || trx.receiver || "-"}</td>
-                          <td>{trx.amount.toFixed(2)}</td>
-                          <td>{trx.quantity}</td>
-                          <td>{trx.rate.toFixed(2)}</td>
+                          <td>{formatNumber(trx.amount)}</td>
+                          <td>{trx.quantity ?? 0}</td>
+                          <td>{formatNumber(trx.rate)}</td>
                           <td>{trx.fromAccount || "-"}</td>
                           <td>{trx.note || "-"}</td>
                         </tr>

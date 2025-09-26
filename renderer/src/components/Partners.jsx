@@ -187,7 +187,7 @@ const Partners = () => {
                       type="number"
                       className="form-control "
                       placeholder="Initial Quantity"
-                      value={balance}
+                      value={quantity}
                       onChange={(e) => setQuantity(e.target.value)}
                     />
                   </div>

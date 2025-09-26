@@ -44,7 +44,7 @@ const Ledger = () => {
             {/* Creditors */}
             <div className="card mb-3 overflow-hidden border-light-dark">
               <div className="card-header d-flex justify-content-between align-items-center">
-                <h5 className="mb-0 Oswald">I need to Pay</h5>
+                <h5 className="mb-0 Oswald">Need to Pay Me</h5>
                 <button
                   className="btn btn-sm btn-dark"
                   onClick={() => setShowCreditors(!showCreditors)}
@@ -61,7 +61,6 @@ const Ledger = () => {
                           <th>Name</th>
                           <th>Amount</th>
                           <th>Quantity</th>
-                          <th>Date</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -70,7 +69,6 @@ const Ledger = () => {
                             <td>{c.name}</td>
                             <td>{c.amount}</td>
                             <td>{c.quantity}</td>
-                            <td>{new Date(c.date).toLocaleDateString()}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -84,7 +82,7 @@ const Ledger = () => {
             {/* Debitors */}
             <div className="card mb-3 overflow-hidden border-light-dark">
               <div className="card-header d-flex justify-content-between align-items-center">
-                <h5 className="mb-0 Oswald">Need to Pay me</h5>
+                <h5 className="mb-0 Oswald">I Need to Pay</h5>
                 <button
                   className="btn btn-sm btn-dark"
                   onClick={() => setShowDebitors(!showDebitors)}
@@ -101,7 +99,6 @@ const Ledger = () => {
                           <th>Name</th>
                           <th>Amount</th>
                           <th>Quantity</th>
-                          <th>Date</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -110,7 +107,6 @@ const Ledger = () => {
                             <td>{d.name}</td>
                             <td>{d.amount}</td>
                             <td>{d.quantity}</td>
-                            <td>{new Date(d.date).toLocaleDateString()}</td>
                           </tr>
                         ))}
                       </tbody>

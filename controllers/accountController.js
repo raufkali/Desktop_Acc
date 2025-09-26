@@ -3,6 +3,14 @@ const Account = require("../models/Account");
 // ─── Create Account ───────────────────────────────
 const createAccount = async ({ userId, name, balance }) => {
   try {
+    // check if account exsists
+    const exsists = await Account.findOne({ userId, name });
+    if (exsists) {
+      return {
+        success: false,
+        message: "Account with this name already exsists",
+      };
+    }
     const account = new Account({ userId, name, balance });
     await account.save();
     return { success: true, account };
