@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Chart from "chart.js/auto";
-import "./Dashboard.css"; // 👈 for fade-in animation
+import "./Dashboard.css";
 
 const Dashboard = () => {
   const [dashboard, setDashboard] = useState(null);
@@ -27,7 +27,7 @@ const Dashboard = () => {
                     data.totSent[0]?.total || 0,
                     data.totReceived[0]?.total || 0,
                   ],
-                  backgroundColor: ["#f87171", "#34d399"], // red = sent, green = received
+                  backgroundColor: ["#920000ff", "#00a367ff"], // red = sent, green = received
                 },
               ],
             },
@@ -48,12 +48,12 @@ const Dashboard = () => {
   if (!dashboard) return <div>Loading Dashboard...</div>;
 
   return (
-    <div className="main-content pt-4 pb-4 pe-4 fade-in">
+    <div className="main-content pt-4 pb-4 pe-4 ">
       <h2 className="mb-4 Oswald-bold">Dashboard</h2>
       <div className="row">
         {/* Partners */}
         <div className="col-md-3 mb-3">
-          <div className="card shadow-sm ">
+          <div className="card bg-light shadow-sm ">
             <div className="card-body text-center">
               <h5 className="card-title Oswald">Partners</h5>
               <p className="card-text Oswald-bold">{dashboard.partnersCount}</p>
@@ -63,7 +63,7 @@ const Dashboard = () => {
 
         {/* Transactions */}
         <div className="col-md-3 mb-3">
-          <div className="card shadow-sm ">
+          <div className="card bg-light shadow-sm ">
             <div className="card-body text-center">
               <h5 className="card-title Oswald">Transactions</h5>
               <p className="card-text Oswald-bold">{dashboard.trxsCount}</p>
@@ -73,7 +73,7 @@ const Dashboard = () => {
 
         {/* Persons */}
         <div className="col-md-3 mb-3">
-          <div className="card shadow-sm">
+          <div className="card bg-light shadow-sm">
             <div className="card-body text-center">
               <h5 className="card-title Oswald">Persons</h5>
               <p className="card-text Oswald-bold">{dashboard.personsCount}</p>
@@ -83,7 +83,7 @@ const Dashboard = () => {
 
         {/* Accounts */}
         <div className="col-md-3 mb-3">
-          <div className="card shadow-sm">
+          <div className="card bg-light shadow-sm">
             <div className="card-body text-center">
               <h5 className="card-title Oswald">Accounts</h5>
               <p className="card-text Oswald-bold">{dashboard.accountsCount}</p>
@@ -95,26 +95,39 @@ const Dashboard = () => {
       {/* Partner Accounts card */}
       <div className="row mt-4">
         <div className="col-12">
-          <div className="card shadow-sm ">
+          <div className="card bg-light shadow-sm ">
             <div className="card-body">
               <h5 className="card-title Oswald">Partner Accounts</h5>
               <div className="table-responsive">
-                <table className="table table-striped">
-                  <thead>
+                <table className="table table-white table-bordered border-dark">
+                  <thead className="table-dark">
                     <tr>
                       <th>Name</th>
-                      <th>Total Sent</th>
-                      <th>Total Received</th>
+                      <th>Total Sent Qty</th>
+                      <th>Total Received Qty</th>
+                      <th> Net Quantity</th>
+                      <th>Total Sent Amount</th>
+                      <th>Total Received Amount</th>
                       <th>Profit</th>
                     </tr>
                   </thead>
                   <tbody>
                     {dashboard.partnerAcc.map((p, idx) => (
                       <tr key={idx}>
-                        {console.log(dashboard.partnerAcc)}
-                        <td>{p.name}</td>
-                        <td>{p.totalSent}</td>
-                        <td>{p.totalReceived}</td>
+                        <td className="Oswald">{p.name.toUpperCase()}</td>
+                        <td>{p.totalSentQnt}</td>
+                        <td>{p.totalReceivedQnt}</td>
+                        <td
+                          className={
+                            p.remainQnt >= 0
+                              ? "text-success Oswald-bold"
+                              : "text-danger Oswald-bold"
+                          }
+                        >
+                          {p.remainQnt}
+                        </td>
+                        <td>{p.totalSentAmnt}</td>
+                        <td>{p.totalReceivedAmnt}</td>
                         <td
                           className={
                             p.profit >= 0
@@ -132,12 +145,10 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Chart */}
-      <div className="row mt-4">
-        <div className="col-12">
-          <div className="card shadow-sm ">
+        {/* Chart */}
+        <div className="col-12 mt-4">
+          <div className="card bg-light shadow-sm ">
             <div className="card-body">
               <h5 className="card-title Oswald">Transactions Overview</h5>
               <canvas id="trxChart" height="100"></canvas>

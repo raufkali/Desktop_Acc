@@ -11,60 +11,45 @@ const getDashboard = async (userId) => {
     const personsCount = await Person.countDocuments({ userId });
     const accountsCount = await Account.countDocuments({ userId });
 
+    // Get all transactions once (instead of aggregation)
+    const allTrxs = await Trx.find({ userId });
+
     // Totals
-    const totSent = await Trx.aggregate([
-      { $match: { userId, trxType: "send" } },
-      { $group: { _id: null, total: { $sum: "$amount" } } },
-    ]);
-    const totReceived = await Trx.aggregate([
-      { $match: { userId, trxType: "receive" } },
-      { $group: { _id: null, total: { $sum: "$amount" } } },
-    ]);
+    const totSent = allTrxs
+      .filter((t) => t.trxType === "send")
+      .reduce((sum, t) => sum + t.amount, 0);
 
-    // Partner Accounts using aggregation (faster than looping)
-    const partnerStats = await Trx.aggregate([
-      { $match: { userId } },
-      {
-        $facet: {
-          sent: [
-            { $match: { trxType: "send" } },
-            { $group: { _id: "$sender", totalSent: { $sum: "$amount" } } },
-          ],
-          received: [
-            { $match: { trxType: "receive" } },
-            {
-              $group: { _id: "$receiver", totalReceived: { $sum: "$amount" } },
-            },
-          ],
-        },
-      },
-      {
-        $project: {
-          merged: {
-            $setUnion: ["$sent", "$received"],
-          },
-          sent: 1,
-          received: 1,
-        },
-      },
-    ]);
+    const totReceived = allTrxs
+      .filter((t) => t.trxType === "receive")
+      .reduce((sum, t) => sum + t.amount, 0);
 
-    const sentMap = new Map(
-      partnerStats[0].sent.map((s) => [s._id, s.totalSent])
-    );
-    const recvMap = new Map(
-      partnerStats[0].received.map((r) => [r._id, r.totalReceived])
-    );
-
+    // Partner Accounts (calculate manually)
     const allPartners = await Partner.find({ userId });
+
     const partnerAcc = allPartners.map((partner) => {
-      const totalSent = sentMap.get(partner.name) || 0;
-      const totalReceived = recvMap.get(partner.name) || 0;
+      const totalSentAmnt = allTrxs
+        .filter((t) => t.trxType === "send" && t.onBehalfOf === partner.name)
+        .reduce((sum, t) => sum + t.amount, 0);
+
+      const totalReceivedAmnt = allTrxs
+        .filter((t) => t.trxType === "receive" && t.sender === partner.name)
+        .reduce((sum, t) => sum + t.amount, 0);
+      const totalSentQnt = allTrxs
+        .filter((t) => t.trxType === "send" && t.onBehalfOf === partner.name)
+        .reduce((sum, t) => sum + t.quantity, 0);
+
+      const totalReceivedQnt = allTrxs
+        .filter((t) => t.trxType === "receive" && t.sender === partner.name)
+        .reduce((sum, t) => sum + t.quantity, 0);
+
       return {
         name: partner.name,
-        totalSent,
-        totalReceived,
-        profit: totalReceived - totalSent,
+        totalSentAmnt,
+        totalReceivedAmnt,
+        totalReceivedQnt,
+        totalSentQnt,
+        remainQnt: totalReceivedQnt - totalSentQnt,
+        profit: totalReceivedAmnt - totalSentAmnt,
       };
     });
 
