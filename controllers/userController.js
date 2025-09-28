@@ -74,4 +74,39 @@ const loginUser = async ({ data }) => {
   }
 };
 
-module.exports = { createUser, loginUser };
+// get profile
+const getProfile = async (userId) => {
+  try {
+    const res = await User.findById(userId).select("-password");
+    if (!res) throw new Error("User not found");
+    return res.toObject();
+  } catch (error) {
+    throw error;
+  }
+};
+
+// update Profile
+const updateProfile = async (userId, { username, email, password }) => {
+  try {
+    const updateData = {};
+
+    if (username) updateData.username = username;
+    if (email) updateData.email = email;
+    if (password) {
+      updateData.password = await bcrypt.hash(password, 10);
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
+      new: true,
+      runValidators: true,
+    }).select("-password"); // ✅ chain select AFTER update
+
+    if (!updatedUser) throw new Error("User not found");
+
+    return updatedUser.toObject();
+  } catch (err) {
+    throw err;
+  }
+};
+
+module.exports = { createUser, loginUser, getProfile, updateProfile };

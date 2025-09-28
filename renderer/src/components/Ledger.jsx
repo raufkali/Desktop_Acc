@@ -34,7 +34,7 @@ const Ledger = () => {
   return (
     <div className="main-content pt-5 pb-4 pe-4">
       <div class="card  bg-light-dark shadow p-5">
-        {error && <h1 className="text-danger">{error}</h1>}
+        {error && <h6 className="text-danger">{error}</h6>}
 
         {!error && person && (
           <>

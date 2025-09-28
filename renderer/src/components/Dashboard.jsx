@@ -12,9 +12,8 @@ const Dashboard = () => {
         const userId = JSON.parse(user)?._id;
         const data = await window.dashboardAPI.get(userId);
         setDashboard(data);
-
         // Build chart after data is loaded
-        if (data.totSent?.length || data.totReceived?.length) {
+        if (data.totSent != null && data.totReceived != null) {
           const ctx = document.getElementById("trxChart").getContext("2d");
           new Chart(ctx, {
             type: "bar",
@@ -23,11 +22,8 @@ const Dashboard = () => {
               datasets: [
                 {
                   label: "Transactions",
-                  data: [
-                    data.totSent[0]?.total || 0,
-                    data.totReceived[0]?.total || 0,
-                  ],
-                  backgroundColor: ["#920000ff", "#00a367ff"], // red = sent, green = received
+                  data: [data.totSent, data.totReceived],
+                  backgroundColor: ["#920000ff", "#00a367ff"],
                 },
               ],
             },

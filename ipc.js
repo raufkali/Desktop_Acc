@@ -4,7 +4,12 @@ const { ipcMain } = require("electron");
 const serialize = (data) => JSON.parse(JSON.stringify(data));
 
 // ─── Users ───────────────────────────────
-const { createUser, loginUser } = require("./controllers/userController");
+const {
+  createUser,
+  loginUser,
+  getProfile,
+  updateProfile,
+} = require("./controllers/userController");
 
 ipcMain.handle("user:create", async (event, payload) => {
   try {
@@ -23,7 +28,23 @@ ipcMain.handle("user:login", async (event, payload) => {
     return { error: error.message };
   }
 });
+ipcMain.handle("user:updateProfile", async (event, { userId, data }) => {
+  try {
+    const updated = await updateProfile(userId, data);
+    return serialize(updated);
+  } catch (error) {
+    return { error: error.message };
+  }
+});
 
+ipcMain.handle("user:getProfile", async (event, userId) => {
+  try {
+    const profile = await getProfile(userId);
+    return serialize(profile);
+  } catch (error) {
+    return { error: error.message };
+  }
+});
 // ─── Transactions ────────────────────────
 const {
   createTransaction,
@@ -49,9 +70,9 @@ ipcMain.handle("transaction:create", async (event, data) => {
   }
 });
 
-ipcMain.handle("transaction:delete", async (event, id) => {
+ipcMain.handle("transaction:delete", async (event, ids) => {
   try {
-    const result = await deleteTransaction(id);
+    const result = await deleteTransaction(ids); // 👈 wrapped in object
     return serialize(result);
   } catch (err) {
     return { error: err.message };
@@ -168,12 +189,17 @@ ipcMain.handle("partner:getAll", async (event, { userId }) => {
 
 // ─── Summary ─────────────────────────────
 const { getSummary } = require("./controllers/summaryController");
-ipcMain.handle("summary:get", async (event, userId) => {
+
+ipcMain.handle("summary:get", async (event, { userId, filterType, date }) => {
   try {
-    const summary = await getSummary(userId);
-    return serialize(summary);
+    if (!userId) throw new Error("userId is required");
+
+    // Pass filter info to controller
+    const summary = await getSummary(userId, filterType, date);
+
+    return { success: true, data: summary };
   } catch (err) {
-    return { error: err.message };
+    return { success: false, error: err.message };
   }
 });
 

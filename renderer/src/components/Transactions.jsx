@@ -167,7 +167,8 @@ const Transactions = () => {
   const handleDelete = async (id) => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
-      await window.api.deleteTransaction(id, user?._id);
+      const ids = { userId: user?._id, id: id };
+      await window.api.deleteTransaction(ids);
       fetchTransactions();
       fetchAccounts();
       fetchPartners();

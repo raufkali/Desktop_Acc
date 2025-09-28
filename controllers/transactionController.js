@@ -373,11 +373,13 @@ const createTransaction = async (data) => {
 };
 
 // ─── Delete Transaction ───────────────────────────────
-const deleteTransaction = async ({ id, userId }) => {
+const deleteTransaction = async (data) => {
   try {
+    console.log("Fetching data: ", data);
+
     const trx = await Transaction.findById(id);
     if (!trx) throw new Error("Transaction not found!");
-
+    console.log("Trx: ", trx);
     if (trx.userId.toString() !== userId.toString()) {
       throw new Error("Not authorized to delete this transaction!");
     }
@@ -385,7 +387,6 @@ const deleteTransaction = async ({ id, userId }) => {
     // find account
     const account = await Account.findOne({ name: trx.fromAccount, userId });
     if (!account) throw new Error("Account not found for this transaction!");
-
     // reverse account balance
     if (trx.trxType === "send") {
       account.balance = parseFloat(account.balance) + parseFloat(trx.amount);
@@ -396,6 +397,8 @@ const deleteTransaction = async ({ id, userId }) => {
         if (partner) {
           partner.Balance =
             parseFloat(partner.Balance) - parseFloat(trx.amount);
+          partner.Quantity =
+            parseFloat(partner.Quantity) - parseFloat(trx.quantity);
           await partner.save();
         }
       }
@@ -406,25 +409,72 @@ const deleteTransaction = async ({ id, userId }) => {
       const partner = await Partner.findOne({ name: trx.sender, userId });
       if (partner) {
         partner.Balance = parseFloat(partner.Balance) + parseFloat(trx.amount);
+        partner.Quantity =
+          parseFloat(partner.Quantity) + parseFloat(trx.quantity);
         await partner.save();
       }
     }
     await account.save();
 
-    // remove from Person as well
+    // reverse Person changes
     const person = await Person.findOne({ userId });
     if (person) {
+      // helper to safely parse numbers
+      const parseNum = (v) => {
+        const n = Number(v);
+        return Number.isNaN(n) ? 0 : n;
+      };
+
+      // remove from sendTrx/receiveTrx
       if (trx.trxType === "send") {
-        person.transactions.sendTrx.pull(trx._id);
-        person.debitors = person.debitors.filter(
-          (d) => d.trxId.toString() !== trx._id.toString()
+        person.transactions.sendTrx = person.transactions.sendTrx.filter(
+          (t) => t.trxId.toString() !== trx._id.toString()
         );
+
+        // reverse ledger → undo what send did by applying receive logic
+        const entryName = trx.onBehalfOf || trx.receiver;
+        const cred = person.creditors.find((c) => c.name === entryName);
+        const deb = person.debitors.find((d) => d.name === entryName);
+
+        if (cred) {
+          // subtracting creditor becomes receive reversal
+          cred.amount = parseNum(cred.amount) - parseNum(trx.amount);
+          cred.quantity = parseNum(cred.quantity) - parseNum(trx.quantity);
+          if (cred.amount <= 0 && cred.quantity <= 0) {
+            person.creditors = person.creditors.filter(
+              (c) => c.name !== entryName
+            );
+          }
+        } else if (deb) {
+          // if it had flipped into debitor earlier, reverse that
+          deb.amount = parseNum(deb.amount) + parseNum(trx.amount);
+          deb.quantity = parseNum(deb.quantity) + parseNum(trx.quantity);
+        }
       } else if (trx.trxType === "receive") {
-        person.transactions.receiveTrx.pull(trx._id);
-        person.creditors = person.creditors.filter(
-          (c) => c.trxId.toString() !== trx._id.toString()
+        person.transactions.receiveTrx = person.transactions.receiveTrx.filter(
+          (t) => t.trxId.toString() !== trx._id.toString()
         );
+
+        // reverse ledger → undo what receive did by applying send logic
+        const entryName = trx.sender;
+        const deb = person.debitors.find((d) => d.name === entryName);
+        const cred = person.creditors.find((c) => c.name === entryName);
+
+        if (deb) {
+          // subtracting debitor becomes send reversal
+          deb.amount = parseNum(deb.amount) - parseNum(trx.amount);
+          deb.quantity = parseNum(deb.quantity) - parseNum(trx.quantity);
+          if (deb.amount <= 0 && deb.quantity <= 0) {
+            person.debitors = person.debitors.filter(
+              (d) => d.name !== entryName
+            );
+          }
+        } else if (cred) {
+          cred.amount = parseNum(cred.amount) + parseNum(trx.amount);
+          cred.quantity = parseNum(cred.quantity) + parseNum(trx.quantity);
+        }
       }
+
       await person.save();
     }
 
@@ -432,16 +482,7 @@ const deleteTransaction = async ({ id, userId }) => {
     await trx.deleteOne();
 
     return {
-      message: "Transaction deleted and reversed successfully",
-      reversed: {
-        sender: trx.receiver,
-        receiver: trx.sender,
-        trxType: trx.trxType === "send" ? "receive" : "send",
-        amount: trx.amount,
-        rate: trx.rate,
-        quantity: trx.quantity,
-        userId: trx.userId,
-      },
+      message: "Transaction deleted and fully reversed successfully",
     };
   } catch (error) {
     return { error: error.message };

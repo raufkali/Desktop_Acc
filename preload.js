@@ -5,10 +5,12 @@ contextBridge.exposeInMainWorld("api", {
   // Users
   createUser: (data) => ipcRenderer.invoke("user:create", data),
   loginUser: (data) => ipcRenderer.invoke("user:login", data),
-
+  getProfile: (userId) => ipcRenderer.invoke("user:getProfile", userId),
+  updateProfile: (userId, data) =>
+    ipcRenderer.invoke("user:updateProfile", { userId, data }),
   // Transactions
   createTransaction: (data) => ipcRenderer.invoke("transaction:create", data),
-  deleteTransaction: (id) => ipcRenderer.invoke("transaction:delete", id),
+  deleteTransaction: (ids) => ipcRenderer.invoke("transaction:delete", ids),
   getTransactions: (userId) => ipcRenderer.invoke("transaction:get", userId),
 });
 
@@ -16,7 +18,7 @@ contextBridge.exposeInMainWorld("api", {
 contextBridge.exposeInMainWorld("personAPI", {
   create: (personData) => ipcRenderer.invoke("person:create", personData),
   get: (userId) => ipcRenderer.invoke("person:get", userId),
-  delete: (id) => ipcRenderer.invoke("person:delete", id),
+  delete: (ids) => ipcRenderer.invoke("person:delete", ids),
 });
 
 // ─── Accounts ──────────────────────────────
@@ -36,7 +38,8 @@ contextBridge.exposeInMainWorld("partnerAPI", {
 
 // ─── Summary ──────────────────────────────
 contextBridge.exposeInMainWorld("summaryAPI", {
-  get: (userId) => ipcRenderer.invoke("summary:get", userId),
+  get: (userId, filterType = "day", date = new Date()) =>
+    ipcRenderer.invoke("summary:get", { userId, filterType, date }),
 });
 
 // ─── Dashboard ──────────────────────────────
