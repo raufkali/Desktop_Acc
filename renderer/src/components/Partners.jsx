@@ -7,8 +7,8 @@ const Partners = () => {
   const [showModal, setShowModal] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [balance, setBalance] = useState("");
-  const [quantity, setQuantity] = useState("");
+  const [balance, setBalance] = useState(0);
+  const [quantity, setQuantity] = useState(0);
   const [userId, setUserId] = useState(null);
 
   // ─── Get UserId from LocalStorage ───────────────────────────────
@@ -47,7 +47,7 @@ const Partners = () => {
     try {
       const res = await window.partnerAPI.create({
         name,
-        phone: Number(phone),
+        phone,
         Balance: Number(balance) || 0,
         userId,
       });

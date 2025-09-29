@@ -18,6 +18,10 @@ const debCredSchema = new mongoose.Schema({
 
 // Transaction Schema
 const trxSchema = new mongoose.Schema({
+  _id: {
+    type: String, // store as string instead of ObjectId
+    default: () => new mongoose.Types.ObjectId().toString(),
+  },
   name: String,
   amount: Number,
   rate: Number,
@@ -33,6 +37,10 @@ const trxSchema = new mongoose.Schema({
 // Person schema
 const personSchema = new mongoose.Schema(
   {
+    _id: {
+      type: String, // store as string instead of ObjectId
+      default: () => new mongoose.Types.ObjectId().toString(),
+    },
     name: {
       type: String,
       required: true,

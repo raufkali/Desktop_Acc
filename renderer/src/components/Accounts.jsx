@@ -165,7 +165,7 @@ const Account = () => {
                   >
                     Cancel
                   </button>
-                  <button className="btn btn-primary" onClick={handleCreate}>
+                  <button className="btn btn-dark" onClick={handleCreate}>
                     Save Account
                   </button>
                 </div>

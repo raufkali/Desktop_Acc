@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { option } from "framer-motion/client";
 
 const Transactions = () => {
   const [bgBlur, setBgBlur] = useState(false);
@@ -64,13 +65,19 @@ const Transactions = () => {
   const fetchPartners = async () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
-      // #{ERROR HERE}
-      const data = await window.partnerAPI.getAll({ userId: user?._id });
+      if (!user?._id) {
+        setError("User not found in localStorage");
+        return;
+      }
+
+      // call preload API
+      const data = await window.partnerAPI.getAll({ userId: user._id });
+
       if (data && !data.error) {
         const cleaned = (Array.isArray(data) ? data : data?.partners || []).map(
           (partner) => ({
-            _id: partner._doc?._id || partner._id,
-            name: partner._doc?.name || partner.name,
+            _id: partner?._id || partner?._doc?._id,
+            name: partner?.name || partner?._doc?.name,
           })
         );
         setPartners(cleaned);
@@ -78,7 +85,7 @@ const Transactions = () => {
         setError(data?.error || "Failed to fetch partners");
       }
     } catch (err) {
-      console.error(err);
+      console.error("Fetch partners error:", err);
       setError("Failed to fetch partners");
     }
   };
@@ -102,10 +109,10 @@ const Transactions = () => {
       sender: "",
       receiver: "",
       onBehalfOf: "",
-      fromAccount: accounts.length > 0 ? accounts[0].name : "",
+      fromAccount: "",
       amount: "",
       rate: "",
-      quantity: "",
+      quantity: 0,
       createdAt: new Date().toISOString().split("T")[0],
       note: "",
     });
@@ -197,7 +204,7 @@ const Transactions = () => {
                 <table className="table table-hover table-striped border-dark border-1 mb-0 table-bordered">
                   <thead className="table-dark">
                     <tr className="Oswald text-center">
-                      <th>#</th>
+                      <th>Trx No.</th>
                       <th>Date</th>
                       <th>Type</th>
                       <th>Sender</th>
@@ -215,7 +222,8 @@ const Transactions = () => {
                     {transactions.length > 0 ? (
                       transactions.map((trx, idx) => (
                         <tr key={trx._id}>
-                          <td>{idx + 1}</td>
+                          <td>{trx.trxNumber}</td>
+                          {console.log(trx)}
                           <td>
                             {trx.createdAt
                               ? new Date(trx.createdAt).toLocaleDateString()
@@ -239,12 +247,18 @@ const Transactions = () => {
                           <td>{trx.quantity || "-"}</td>
                           <td>{trx.note || ""}</td>
                           <td>
-                            <button
-                              className="btn btn-sm btn-danger"
-                              onClick={() => handleDelete(trx._id)}
-                            >
-                              <FontAwesomeIcon icon={faTrash} />
-                            </button>
+                            {trx.reversed ? (
+                              <span className="text-muted">Reversed</span>
+                            ) : (
+                              <button
+                                className="btn btn-sm btn-outline-danger"
+                                onClick={() => handleDelete(trx._id)}
+                                title="Delete Transaction"
+                                disabled={trx.reversed}
+                              >
+                                <FontAwesomeIcon icon={faTrash} />
+                              </button>
+                            )}
                           </td>
                         </tr>
                       ))
@@ -322,6 +336,8 @@ const Transactions = () => {
                             className="form-select"
                             required
                           >
+                            <option value="">-- None --</option>
+
                             {accounts.map((acc) => (
                               <option key={acc._id} value={acc.name}>
                                 {acc.name}
@@ -398,9 +414,16 @@ const Transactions = () => {
                             value={form.sender}
                             onChange={handleChange}
                             className="form-control"
+                            list="partnersList" // link to datalist
                             required
                           />
+                          <datalist id="partnersList" className="bg-light">
+                            {partners.map((p) => (
+                              <option key={p._id} value={p.name} />
+                            ))}
+                          </datalist>
                         </div>
+
                         <div className="col-md-6">
                           <label className="form-label">Account</label>
                           <select
@@ -410,6 +433,8 @@ const Transactions = () => {
                             className="form-select"
                             required
                           >
+                            <option value="">-- None --</option>
+
                             {accounts.map((acc) => (
                               <option key={acc._id} value={acc.name}>
                                 {acc.name}

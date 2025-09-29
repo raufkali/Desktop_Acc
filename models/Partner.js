@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const partnerSchema = new mongoose.Schema({
+  _id: {
+    type: String, // store as string instead of ObjectId
+    default: () => new mongoose.Types.ObjectId().toString(),
+  },
   name: {
     type: String,
     required: true,

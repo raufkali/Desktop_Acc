@@ -74,7 +74,7 @@ const Ledger = () => {
                       </tbody>
                     </table>
                   ) : (
-                    <p>No creditors</p>
+                    <p className="text-center p-2">No creditors</p>
                   )}
                 </div>
               )}
